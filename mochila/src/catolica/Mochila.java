@@ -15,12 +15,22 @@ public class Mochila {
 	
 	// semente para o random
 	public long semente;
+	// objeto para gerar valores aleatorios
 	public Random rand;
+	// matriz da populacao
 	public boolean[][] pop = new boolean[POPULACAO][LIVROS];
+	// matriz de herdeiros
 	public boolean[][] herdeiros = new boolean[POPULACAO][LIVROS];
+	// matriz de aptidao (fitness) para uso na avaliacao e roleta
 	public float[][] aptidao = new float[POPULACAO][2];
+	// matriz com pesos dos livros
 	public float[] pesos_livros = new float[LIVROS];
 	
+	/*
+	 * Metodo para geracao de uma populacao inicial.
+	 * No problema da mochila cada gene representa a presenca ou nao de
+	 * um livro na mochila.
+	 */
 	public void populacao_inicial()
 	{
 		semente = (long) System.currentTimeMillis();
@@ -31,6 +41,10 @@ public class Mochila {
 				pop[i][j] = rand.nextBoolean();
 	}
 	
+	/*
+	 * O operador genetico da mutacao altera o valor de um gene
+	 * de um individuo sorteado.
+	 */
 	public void mutacao()
 	{
 		int gene, individuo;
@@ -39,6 +53,10 @@ public class Mochila {
 		pop[individuo][gene] = !pop[individuo][gene];
 	}
 	
+	/*
+	 * Metodo para carregamento dos valores dos pesos dos livros
+	 * a partir de um arquivo.
+	 */
 	public void carrega_pesos()
 	{
 		try{
