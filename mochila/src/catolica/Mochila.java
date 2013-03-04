@@ -52,37 +52,47 @@ public class Mochila {
 		individuo = rand.nextInt(POPULACAO);
 		pop[individuo][gene] = !pop[individuo][gene];
 	}
+	
 	/*
 	* Metodo de avaliacao do cromossomo. Fitness function.
 	*/
-public void avaliacao()
-{
-	float peso = 0;
-	float peso_total = 0;
-	int i, j;
-	// Faz o calculo do peso de cada individuo
-	for(i = 0; i < POPULACAO; i++)
+	public void avaliacao()
 	{
-		for(j = 0; j < LIVROS; j++)
+		float peso = 0;
+		float peso_total = 0;
+		int i, j;
+		// Faz o calculo do peso de cada individuo
+		for(i = 0; i < POPULACAO; i++)
 		{
-			if(pop[i][j] == true)
-				peso += pesos_livros[j];
+			for(j = 0; j < LIVROS; j++)
+			{
+				if(pop[i][j] == true)
+					peso += pesos_livros[j];
+			}
+			aptidao[i][0] = (float) (peso > MOCHILA ? 0 : peso);
+			peso_total += peso; 
+			peso = 0;
 		}
-		aptidao[i][0] = (float) (peso > MOCHILA ? 0 : peso);
-		peso_total += peso; 
-		peso = 0;
+		// Faz o calculo da porcentagem para a roleta de cada individuo
+		for(i = 0; i < POPULACAO; i++)
+		{
+			aptidao[i][1] = (aptidao[i][0] * 100)/peso_total;
+		}
 	}
-	// Faz o calculo da porcentagem para a roleta de cada individuo
-	for(i = 0; i < POPULACAO; i++)
+	
+	public int roleta()
 	{
-		aptidao[i][1] = (aptidao[i][0] * 100)/peso_total;
+		int x = rand.nextInt(100);
+		int i;
+		float soma = 0;
+		for(i = 0; i < POPULACAO; i++)
+		{
+			soma += aptidao[i][1];
+			if(soma >= x)
+				return i;
+		}
+		return 0;
 	}
-}
-
-public int roleta()
-{
-	return 0;
-}
 	
 	/*
 	 * Metodo para carregamento dos valores dos pesos dos livros
@@ -116,7 +126,7 @@ public int roleta()
 		ag.populacao_inicial();
 		ag.mutacao();
 		ag.carrega_pesos();
-
+		ag.avaliacao();
 	}
 
 }
