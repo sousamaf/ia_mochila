@@ -8,9 +8,13 @@ import java.util.Random;
 
 public class Mochila {
 	
-	private static final int LIVROS = 6;
-	private static final int POPULACAO = 100;
-	private static final double MOCHILA = 2.0;
+	private static final int LIVROS = 15; // Genes
+	private static final int POPULACAO = 1000; // Cromossomos
+	private static final double MOCHILA = 3.0; // carga maxima da mochila
+	private static final int GERACOES = 100; // Condicao de parada por tempo
+	
+	private static final int qtd_mutacao = 6;
+	private static final int qtd_cruzamento = 94;
 	
 	// semente para o random
 	public long semente;
@@ -48,10 +52,14 @@ public class Mochila {
 	 */
 	public void mutacao()
 	{
-		int gene, individuo;
+		int gene, individuo, i;
 		gene = rand.nextInt(LIVROS);
 		individuo = rand.nextInt(POPULACAO);
-		pop[individuo][gene] = !pop[individuo][gene];
+		for(i = 0; i < LIVROS; i++)
+			herdeiros[cont_herdeiro][i] = pop[individuo][i];
+		
+		herdeiros[cont_herdeiro][gene] = !herdeiros[cont_herdeiro][gene];
+		cont_herdeiro++;
 	}
 	/*
 	 * Operador genetico de cruzamento simples em um ponto fixo.
@@ -86,6 +94,9 @@ public class Mochila {
 	*/
 	public void avaliacao()
 	{
+		int melhor = 0;
+		float fmelhor = 0;
+		
 		float peso = 0;
 		float peso_total = 0;
 		int i, j;
@@ -98,9 +109,19 @@ public class Mochila {
 					peso += pesos_livros[j];
 			}
 			aptidao[i][0] = (float) (peso > MOCHILA ? 0 : peso);
+
+			// armazena o id do melhor elemento.
+			if(fmelhor < aptidao[i][0])
+			{
+				fmelhor = aptidao[i][0];
+				melhor = i;
+			}
+
 			peso_total += peso; 
 			peso = 0;
 		}
+		System.out.print("Melhor combinacao: ");
+		System.out.println(fmelhor);
 		// Faz o calculo da porcentagem para a roleta de cada individuo
 		for(i = 0; i < POPULACAO; i++)
 		{
@@ -108,6 +129,26 @@ public class Mochila {
 		}
 	}
 	
+	/*
+	 * Metodo de substituicao da populacao.
+	 * Copia os descendentes para a populacao.
+	 */
+	public void substituicao()
+	{
+		int i, j;
+		for(i = 0; i < POPULACAO; i++)
+		{
+			for(j = 0; j < LIVROS; j++)
+			{
+				pop[i][j] = herdeiros[i][j];
+			}
+		}
+		cont_herdeiro = 0;
+	}
+	
+	/*
+	 * Metodo de sorteio por roleta.
+	 */
 	public int roleta()
 	{
 		int x = rand.nextInt(100);
@@ -149,13 +190,29 @@ public class Mochila {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		int i = 0;
+		int imutacao = 0; // controle da mutacao
+	
+		int pmutacao = (POPULACAO * qtd_mutacao)/100; // condicao de parada da mutacao
+		
 		Mochila ag = new Mochila();
 		ag.populacao_inicial(); // cria populacao inicial
 		ag.carrega_pesos(); // carrega pesos dos livros
-		ag.avaliacao(); // avaliacao da populacao
-		ag.mutacao(); // operador genetico de mutacao
-		ag.cruzamento_simples();
+		while (i < GERACOES)
+		{
+			ag.avaliacao(); // avaliacao da populacao
+			while(imutacao < pmutacao-1)
+			{
+				ag.mutacao(); // operador genetico de mutacao
+				imutacao++;
+			}
+			while(ag.cont_herdeiro < POPULACAO-1)
+			{
+				ag.cruzamento_simples();
+			}
+			ag.substituicao();
+			i++;
+		}
 		
 	}
 
