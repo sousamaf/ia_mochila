@@ -8,7 +8,6 @@ import java.util.Random;
 
 public class Mochila {
 	
-	
 	private static final int LIVROS = 6;
 	private static final int POPULACAO = 100;
 	private static final double MOCHILA = 2.0;
@@ -21,6 +20,8 @@ public class Mochila {
 	public boolean[][] pop = new boolean[POPULACAO][LIVROS];
 	// matriz de herdeiros
 	public boolean[][] herdeiros = new boolean[POPULACAO][LIVROS];
+	// controle de iteracao para herdeiros
+	public int cont_herdeiro = 0;
 	// matriz de aptidao (fitness) para uso na avaliacao e roleta
 	public float[][] aptidao = new float[POPULACAO][2];
 	// matriz com pesos dos livros
@@ -51,6 +52,33 @@ public class Mochila {
 		gene = rand.nextInt(LIVROS);
 		individuo = rand.nextInt(POPULACAO);
 		pop[individuo][gene] = !pop[individuo][gene];
+	}
+	/*
+	 * Operador genetico de cruzamento simples em um ponto fixo.
+	 */
+	public void cruzamento_simples()
+	{
+		// sorteio de dois individuos
+		int individuo1 = roleta();
+		int individuo2 = roleta();
+		
+		int i;
+		while(individuo1 == individuo2)
+			individuo2 = roleta();
+		// efetua o cruzamento.
+		for(i = 0; i < LIVROS; i++)
+		{
+			if(i < LIVROS/2)
+			{
+				herdeiros[cont_herdeiro][i] = pop[individuo1][i];
+				herdeiros[cont_herdeiro+1][i] = pop[individuo2][i];
+			} else
+			{
+				herdeiros[cont_herdeiro][i] = pop[individuo2][i];
+				herdeiros[cont_herdeiro+1][i] = pop[individuo1][i];				
+			}
+		}
+		cont_herdeiro++; cont_herdeiro++;
 	}
 	
 	/*
@@ -123,10 +151,12 @@ public class Mochila {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Mochila ag = new Mochila();
-		ag.populacao_inicial();
-		ag.mutacao();
-		ag.carrega_pesos();
-		ag.avaliacao();
+		ag.populacao_inicial(); // cria populacao inicial
+		ag.carrega_pesos(); // carrega pesos dos livros
+		ag.avaliacao(); // avaliacao da populacao
+		ag.mutacao(); // operador genetico de mutacao
+		ag.cruzamento_simples();
+		
 	}
 
 }
