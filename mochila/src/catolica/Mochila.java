@@ -88,6 +88,35 @@ public class Mochila {
 		}
 		cont_herdeiro++; cont_herdeiro++;
 	}
+
+	/*
+	 * Operador genetico de cruzamento uniforme (mascara).
+	 */
+	public void cruzamento_uniforme()
+	{
+		// sorteio de dois individuos
+		int individuo1 = roleta();
+		int individuo2 = roleta();
+		
+		int i;
+		while(individuo1 == individuo2)
+			individuo2 = roleta();
+		// efetua o cruzamento.
+		for(i = 0; i < LIVROS; i++)
+		{
+			if(rand.nextBoolean())
+			{
+				herdeiros[cont_herdeiro][i] = pop[individuo1][i];
+				herdeiros[cont_herdeiro+1][i] = pop[individuo2][i];
+			} else
+			{
+				herdeiros[cont_herdeiro][i] = pop[individuo2][i];
+				herdeiros[cont_herdeiro+1][i] = pop[individuo1][i];				
+			}
+		}
+		cont_herdeiro++; cont_herdeiro++;
+	}
+
 	
 	/*
 	* Metodo de avaliacao do cromossomo. Fitness function.
@@ -208,7 +237,7 @@ public class Mochila {
 			}
 			while(ag.cont_herdeiro < POPULACAO-1)
 			{
-				ag.cruzamento_simples();
+				ag.cruzamento_uniforme();
 			}
 			ag.substituicao();
 			i++;
